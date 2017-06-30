@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if request.user.is_authenticated %}
+    <h4>
+        {% if request.user.first_name %}
+            {{ request.user.first_name }}
+        {% else %}
+            {{ request.user.username }}
+        {% endif %}!
+        <br>
+        <a href="{% url 'auth_logout' %}">Logout</a>
+    </h4>
+{% else %}
+    <h4>
+        Welcome Mystery-Person do you want to register??
+        <br>
+        <a href="{% url 'auth_login' %}">Login</a>
+        <a href="{% url 'social:begin' 'facebook' %}">Facebook-Login</a>
+    </h4>
+{% endif %}
+<ul>
+    {% for item in object_list %}
+    <li><a href="{% url 'store:bookDetail' item.pk %}">{{item.title}} - {{item.author}}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
