@@ -15,11 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic import TemplateView
+
 from .settings import MEDIA_ROOT, MEDIA_URL
 from django.conf.urls.static import static
 
 
 urlpatterns = [
+    url(r'^$', TemplateView.as_view(template_name='base.html'), name='start'),
     url(r'^store/', include('store.urls')),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url('', include('social.apps.django_app.urls', namespace='social')),

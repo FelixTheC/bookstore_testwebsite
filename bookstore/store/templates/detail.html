@@ -11,7 +11,8 @@
         <h4>{{ r.text }}</h4>
         <p>{{ r.user }} - {{ r.publish_date }}</p>
         {% if r.user == request.user %}
-            <a href="">Bearbeiten</a>
+            <a href="{{ r.get_update_url }}">Bearbeiten</a>
+            <a href="{{ r.get_delete_url }}">Löschen</a>
         {% endif %}
     {% endfor %}
 {% endif %}

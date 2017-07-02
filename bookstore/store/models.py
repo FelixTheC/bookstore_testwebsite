@@ -40,6 +40,14 @@ class Review(models.Model):
     publish_date = models.DateField(default=timezone.now)
     text = models.TextField()
 
+    def get_update_url(self):
+        return reverse('store:update_review',
+                       kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse('store:delete_review',
+                       kwargs={'pk': self.pk})
+
 
 class Cart(models.Model):
     user = models.ForeignKey(User)

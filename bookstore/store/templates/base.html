@@ -2,11 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="description" content="Bookstore">
+    <meta name="keywords" content="Django,HTML,CSS,JavaScript">
+    <meta name="author" content="John Doe">
     <title>Bookstore</title>
-</head>
-<body>
-{% block content %}
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-{% endblock %}
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+<body style="margin-top:10px;">
+<div class="fluid-container">
+    <div class="row">
+        <div class="col-lg-offset-1 col-lg-10 col-lg-offset-1">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <ul class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                        {% if request.user.is_authenticated %}
+                            <li><h4>Hi
+                            {% if request.user.first_name %}
+                                {{ request.user.first_name }}
+                            {% else %}
+                                {{ request.user.username }}
+                            {% endif %}!
+                            </h4></li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                                <li><a href="{% url 'auth_logout' %}">Logout</a></li>
+                        </ul>
+                        {% else %}
+                        <li><h4>Welcome Mystery-Person do you want to register??</h4></li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="{% url 'auth_login' %}">Login</a></li>
+                            <li><a href="{% url 'social:begin' 'facebook' %}">Facebook-Login</a></li>
+                        </ul>
+                        {% endif %}
+                </div>
+            </nav>
+            <div class="container-fluid">
+                <div class="row">
+                {% block content %}
+                    <div class="col-lg-offset-3">
+                        <h1>Herzlich Willkommen</h1>
+                    </div>
+                {% endblock %}
+                </div>
+            </div>
+
+            <footer>
+                <div class="well well-sm">
+                    <p>footer &copy;</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -3,8 +3,15 @@ from .models import Book, Cart, BookOrder, Review
 from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView, UpdateView, DeleteView
 from django.http import HttpResponseNotAllowed
+
+
+class LoginRequiredMixin(object):
+    @classmethod
+    def as_view(cls, **kwargs):
+        view = super(LoginRequiredMixin, cls).as_view(**kwargs)
+        return login_required(view)
 
 
 class BookListView(ListView):
@@ -27,13 +34,27 @@ class BookDetailView(DetailView):
         return context
 
 
-class ReviewUpdate(UpdateView):
+class ReviewUpdate(LoginRequiredMixin, UpdateView):
     model = Review
-    template_name = 'detail.html'
+    template_name = 'update_review.html'
     form_class = ReviewForm
+    success_url = '/store/'
 
     def form_valid(self, form):
         return super(ReviewUpdate, self).form_valid(form)
+
+
+class ReviewDelete(LoginRequiredMixin, DeleteView):
+    model = Review
+    template_name = 'delete_review.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ReviewDelete, self).get_context_data(**kwargs)
+        context['review'] = Review.objects.get(pk=kwargs['object'].pk)
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        return super(ReviewDelete, self).delete(request, args, kwargs)
 
 
 @login_required()
