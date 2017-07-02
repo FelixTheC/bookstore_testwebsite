@@ -1,9 +1,13 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.core.urlresolvers import reverse
 from django.utils import timezone
+
 
 def image_upload_path(instance, filename):
     return '/'.join(['images', str(instance.name), filename])
+
 
 class Author(models.Model):
     first_name = models.CharField(max_length=200)
@@ -25,6 +29,10 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return reverse('store:book_detail',
+                       kwargs={'pk': str(self.pk)})
+
 
 class Review(models.Model):
     book = models.ForeignKey(Book)
@@ -41,30 +49,31 @@ class Cart(models.Model):
     payment_id = models.CharField(max_length=100, null=True)
 
     def add_to_cart(self, book_id):
-        book = Book.objects.get(pk=book_id)
+        _book = Book.objects.get(pk=book_id)
         try:
-            preexisting_order = BookOrder.objects.get(book=book, cart=self)
+            preexisting_order = BookOrder.objects.get(book=_book, cart=self)
             preexisting_order.quantity += 1
             preexisting_order.save()
-        except BookOrder.DoesNotExist:
+        except ObjectDoesNotExist:
             new_order = BookOrder.objects.create(
-                book=Book,
+                book=_book,
                 cart=self,
                 quantity=1
             )
             new_order.save()
 
     def remove_from_cart(self, book_id):
-        book = Book.objects.get(pk=book_id)
+        _book = Book.objects.get(pk=book_id)
         try:
-            preexisting_order = BookOrder.objects.get(book=book, cart=self)
+            preexisting_order = BookOrder.objects.get(book=_book, cart=self)
             if preexisting_order.quantity > 1:
-                preexisting_order -= 1
+                preexisting_order.quantity -= 1
                 preexisting_order.save()
             else:
                 preexisting_order.delete()
         except BookOrder.DoesNotExist:
             pass
+
 
 class BookOrder(models.Model):
     book = models.ForeignKey(Book)

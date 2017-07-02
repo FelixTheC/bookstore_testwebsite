@@ -1,7 +1,10 @@
-from .models import Book
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from .models import Book, Cart, BookOrder, Review
+from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.views.generic import DetailView, ListView
+from django.shortcuts import render, redirect
+from django.views.generic import DetailView, ListView, UpdateView
+from django.http import HttpResponseNotAllowed
 
 
 class BookListView(ListView):
@@ -18,12 +21,82 @@ class BookDetailView(DetailView):
     template_name = 'detail.html'
 
     def get_context_data(self, **kwargs):
-        return super(BookDetailView, self).get_context_data(**kwargs)
+        context = super(BookDetailView, self).get_context_data(**kwargs)
+        context['form'] = ReviewForm
+        context['review'] = Review.objects.filter(book=kwargs['object'].pk)
+        return context
 
 
-def bookDetail(request, pk):
-    book = Book.objects.filter(pk=pk)
-    context = {
-        'book': book
-    }
-    return render(request, template_name='detail.html', context=context)
+class ReviewUpdate(UpdateView):
+    model = Review
+    template_name = 'detail.html'
+    form_class = ReviewForm
+
+    def form_valid(self, form):
+        return super(ReviewUpdate, self).form_valid(form)
+
+
+@login_required()
+def save_form_review(request, pk):
+    if request.method == 'POST':
+        form_class = ReviewForm
+        form = form_class(data=request.POST)
+        if form.is_valid():
+            new_Review = Review.objects.create(book=Book.objects.get(pk=pk),
+                                               user=request.user,
+                                               text=request.POST['text'])
+            new_Review.save()
+            return redirect('/store/book/'+str(pk)+'/')
+    else:
+        raise HttpResponseNotAllowed('Method not allowed')
+
+
+@login_required()
+def cart(request):
+    context = {}
+    try:
+        total = 0
+        cart = Cart.objects.get(user=request.user)
+        bookOrder = BookOrder.objects.filter(cart=cart)
+        for book in bookOrder:
+            if book.quantity > 1:
+                sum = book.quantity * book.book.price
+            else:
+                sum = book.book.price
+            total += sum
+            context = {
+                'order': bookOrder,
+                'total': total
+            }
+    except MultipleObjectsReturned:
+        pass
+    return render(request, 'cart.html', context)
+
+
+@login_required()
+def add_to_cart(request, pk):
+    try:
+        book = Book.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        pass
+    try:
+        cart = Cart.objects.get(user=request.user,
+                                   active=True)
+        cart.save()
+    except ObjectDoesNotExist:
+        cart = Cart.objects.create(user=request.user)
+        cart.save()
+    cart.add_to_cart(book_id=pk)
+    return redirect('/store/cart/')
+
+
+@login_required()
+def remove_from_cart(request, pk):
+    try:
+        book = Book.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        pass
+    cart = Cart.objects.get(user=request.user,
+                            active=True)
+    cart.remove_from_cart(book_id=pk)
+    return redirect('/store/cart/')
