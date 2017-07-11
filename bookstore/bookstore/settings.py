@@ -14,6 +14,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 # Quick-start development settings - unsuitable for production
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'contact',
     'store'
 ]
 
@@ -105,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'de'
 
 TIME_ZONE = 'UTC'
 
@@ -127,3 +129,14 @@ MEDIA_URL = '/media/'
 ACCOUNT_ACTIVATION_DAYS = 356*10
 REGISTRATION_AUTO_LOGIN = True
 LOGIN_REDIRECT_URL ='/store/'
+
+# EMAIL Settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+with open(PROJECT_ROOT +'/emailname.txt') as f:
+    EMAIL_HOST_USER = f.read().strip()
+with open(PROJECT_ROOT +'/pwd.txt') as f:
+    EMAIL_HOST_PASSWORD = f.read().strip()
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = "hompage@page.de"

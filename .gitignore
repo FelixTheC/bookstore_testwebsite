@@ -96,3 +96,5 @@ ENV/
 .ropeproject
 
 /bookstore/db.sqlite3
+/bookstore/bookstore/emailname.txt
+/bookstore/bookstore/pwd.txt

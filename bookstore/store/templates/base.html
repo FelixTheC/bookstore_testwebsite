@@ -54,13 +54,26 @@
                     <div class="col-lg-offset-3">
                         <h1>Herzlich Willkommen</h1>
                     </div>
+                    <div class="col-lg-12">
+                        {% if messages %}
+                        <ul>
+                            {% for message in messages %}
+                                {% if message.tags %}
+                                <li>{{message.tags}}</li>
+                                {% else %}
+                                <li></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
                 {% endblock %}
                 </div>
             </div>
 
             <footer>
                 <div class="well well-sm">
-                    <p>footer &copy;</p>
+                    <p>footer &copy; <span><a href="{% url 'contact:contact' %}">Contact</a></span></p>
                 </div>
             </footer>
         </div>

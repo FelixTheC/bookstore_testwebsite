@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='base.html'), name='start'),
     url(r'^store/', include('store.urls')),
+    url(r'^contact/', include('contact.urls')),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url('', include('social.apps.django_app.urls', namespace='social')),
     url(r'^admin/', admin.site.urls),
